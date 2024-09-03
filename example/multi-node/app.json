@@ -1,0 +1,46 @@
+{
+  "format_v1": {
+    "command_type": "remote_virtio_gpu",
+    "sender": {
+      "launcher": "host1",
+      "command": "ucl-virtio-gpu-wl-send",
+      "appli": "glmark2-es2-wayland",
+      "frontend_params": {
+        "scanout_x": 0,
+        "scanout_y": 0,
+        "scanout_w": 1920,
+        "scanout_h": 1080
+      }
+    },
+    "receivers": [
+      {
+        "launcher": "host1",
+        "command": "ucl-virtio-gpu-wl-recv",
+        "env": "XDG_RUNTIME_DIR=/run/user/1000 ",
+        "backend_params": {
+          "ivi_surface_id": 1011000,
+          "scanout_x": 0,
+          "scanout_y": 0,
+          "scanout_w": 1920,
+          "scanout_h": 1080,
+          "listen_port": 55667,
+          "initial_screen_color" : "0x33333333"
+        }
+      },
+      {
+        "launcher": "host2",
+        "command": "ucl-virtio-gpu-wl-recv",
+        "env": "XDG_RUNTIME_DIR=/run/user/1000 ",
+        "backend_params": {
+          "ivi_surface_id": 1011000,
+          "scanout_x": 0,
+          "scanout_y": 0,
+          "scanout_w": 1920,
+          "scanout_h": 1080,
+          "listen_port": 55667,
+          "initial_screen_color" : "0x33333333"
+        }
+      }
+    ]
+  }
+}
