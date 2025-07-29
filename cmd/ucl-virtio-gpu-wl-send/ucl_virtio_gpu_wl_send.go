@@ -21,8 +21,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"ucl-tools/internal/ucl"
-	. "ucl-tools/internal/ulog"
 	"io/ioutil"
 	"net"
 	"os"
@@ -33,6 +31,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	"ucl-tools/internal/ucl"
+	. "ucl-tools/internal/ulog"
 )
 
 func fileExists(path string) bool {
@@ -301,7 +301,7 @@ func main() {
 
 	flag.StringVar(&screen, "s", "1920x1080@0,0", "remote-virtio-gpu sender screen config")
 	flag.Var(&targets, "n", "Specify multiple -n options (default 127.0.0.1:55667)")
-	flag.StringVar(&appName, "appli_name", "ucl-virtio-gpu-wl-send", "specify application name")
+	flag.StringVar(&appName, "appli_name", "", "specify application name")
 
 	flag.Parse()
 
@@ -365,6 +365,11 @@ func main() {
 	for _, target := range targets {
 		rvgpuOptions = append(rvgpuOptions, "-n")
 		rvgpuOptions = append(rvgpuOptions, target)
+	}
+
+	if appName != "" {
+		rvgpuOptions = append(rvgpuOptions, "-i")
+		rvgpuOptions = append(rvgpuOptions, appName)
 	}
 
 	rvgpuProxyCmd = exec.Command("rvgpu-proxy", rvgpuOptions...)

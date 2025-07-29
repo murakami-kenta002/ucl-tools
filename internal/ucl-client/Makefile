@@ -22,7 +22,7 @@ GOBUILDFLAGS?=-v
 
 THIS_DIR=.
 
-MODULES=
+MODULES=dcmapi
 
 INSTALL_MODULES=$(patsubst %,install-%, $(MODULES))
 CLEAN_MODULES=$(patsubst %,clean-%, $(MODULES))
@@ -41,6 +41,8 @@ $(INSTALL_MODULES):
 	make -C $${target} install
 
 .PHONY: $(TEST_MODULES)
+test: $(TEST_MODULES)
+
 $(TEST_MODULES) :
 	set -e;\
 	target=`echo $@ | sed -e 's/test-//'`;\
@@ -65,38 +67,10 @@ $(DOC_MODULES):
 	make -C $${target} doc
 
 .PHONY: $(CLEAN_MODULES)
+clean: $(CLEAN_MODULES)
+
 $(CLEAN_MODULES):
 	set -e;\
 	target=`echo $@ | sed -e 's/clean-//'`;\
 	make -C $${target} clean 
-
-install: $(INSTALL_MODULES)
-	set -e;\
-	$(GO) install ${GOBUILDFLAGS} .
-
-.PHONY: test
-test: $(TEST_MODULES)
-	set -e;\
-	$(GO) test .
-
-.PHONY: fmt
-fmt: $(FMT_MODULES)
-	set -e;\
-	$(GO) fmt .
-
-.PHONY: lint
-lint: $(LINT_MODULES)
-	set -e;\
-	$(GO) vet .
-
-.PHONY: doc
-doc: $(DOC_MODULES)
-	set -e;\
-	$(GO) doc .
-
-.PHONY: clean
-clean: $(CLEAN_MODULES)
-	set -e;\
-	$(GO) clean -v .
-
 

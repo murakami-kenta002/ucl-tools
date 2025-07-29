@@ -31,7 +31,8 @@ LINT_MODULES=$(patsubst %,lint-%, $(MODULES))
 DOC_MODULES=$(patsubst %,doc-%, $(MODULES))
 
 .PHONY: all install $(INSTALL_MODULES)
-all install : $(INSTALL_MODULES)
+all : install
+install : $(INSTALL_MODULES) uclclientlib
 
 $(INSTALL_MODULES):
 	set -e;\
@@ -69,6 +70,12 @@ $(CLEAN_MODULES):
 	set -e;\
 	target=`echo $@ | sed -e 's/clean-//'`;\
 	make -C $${target} clean
+
+
+.PHONY:uclclientlib
+uclclientlib:
+	set -e;\
+	make GOOS=${GOOS} GOARCH=${GOARCH} LIBTARGET=${LIBTARGET} -C pkg/ucl-client-lib $@
 
 .PHONY: dep
 dep:

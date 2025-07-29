@@ -1,10 +1,10 @@
 {
   "format_v1": {
     "command_type": "remote_virtio_gpu",
+    "appli_name": "glmark2-es2-wayland",
     "sender": {
       "launcher": "host1",
       "command": "ucl-virtio-gpu-wl-send",
-      "appli": "glmark2-es2-wayland",
       "frontend_params": {
         "scanout_x": 0,
         "scanout_y": 0,

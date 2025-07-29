@@ -21,16 +21,13 @@ GO?=go
 GOBUILDFLAGS?=-v
 
 THIS_DIR=.
-MODULES=ucl-launcher \
+MODULES=ucl-node \
 	ucl-distrib-com \
-	ucl-timing-wrapper \
-	ucl-consistency-keeper \
-	ucl-ncount-master \
-	ucl-ncount-worker \
-	ucl-nkeep-master \
-	ucl-nkeep-worker \
 	ucl-virtio-gpu-wl-send \
-	ucl-virtio-gpu-wl-recv
+	ucl-virtio-gpu-wl-recv \
+	ucl-virtio-gpu-rvgpu-compositor \
+	ucl-lifecycle-manager \
+	ucl-api-comm
 
 
 INSTALL_MODULES=$(patsubst %,install-%, $(MODULES))

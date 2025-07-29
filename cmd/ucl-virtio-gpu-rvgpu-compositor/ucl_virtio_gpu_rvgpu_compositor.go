@@ -49,6 +49,7 @@ func main() {
 		verbose      bool
 		debug        bool
 		sfcId        string
+		dName        string
 		screen       string
 		port         string
 		initialColor string
@@ -61,6 +62,7 @@ func main() {
 	flag.StringVar(&screen, "s", "1920x1080@0,0", "remote-virtio-gpu reciever screen config")
 	flag.StringVar(&port, "P", "55667", "specify remote-virtio-gpu reciever port")
 	flag.StringVar(&initialColor, "B", "0x33333333", "remote-virtio-gpu reciever color config")
+	flag.StringVar(&dName, "D", "rvgpu-compositor-0", "ula-node and remote-virtio-gpu receiver connection domain socket name")
 	flag.Parse()
 
 	xdgRuntimeDir := ucl.GetEnv("XDG_RUNTIME_DIR", "/run/user/1000")
@@ -89,9 +91,9 @@ func main() {
 		DLog.SetOutput(os.Stderr)
 	}
 
-	SetLogPrefix("ucl-virtio-gpu-wl-recv")
+	SetLogPrefix("ucl-virtio-gpu-rvgpu-compositor")
 
-	cmd := exec.Command("rvgpu-renderer", "-B", initialColor, "-p", port, "-b", screen, "-i", sfcId, "-a")
+	cmd := exec.Command("rvgpu-renderer", "-B", initialColor, "-p", port, "-b", screen, "-i", sfcId, "-d", dName, "-a", "-l")
 
 	cmd.Env = os.Environ()
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}

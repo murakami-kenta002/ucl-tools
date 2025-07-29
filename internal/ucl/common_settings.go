@@ -1,11 +1,68 @@
+// SPDX-License-Identifier: Apache-2.0
+/**
+ * Copyright (c) 2024  Panasonic Automotive Systems, Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ucl
 
 import (
+	"context"
 	"errors"
 	"net"
 	"os"
 	"strings"
 )
+
+const (
+	STAT_ExecSuccess = "Success"
+	STAT_ExecErr     = "Error"
+	STAT_ExecFin     = "Finish"
+	STAT_AppRunning  = "AppRunning"
+	STAT_AppStop     = "AppStop"
+)
+
+const (
+	CMD_DistribComm              = "launchApp"
+	CMD_RunApp                   = "runApp"
+	CMD_RunAppAsync              = "runAppAsync"
+	CMD_RunAppAsyncCb            = "runAppAsyncCb"
+	CMD_StopApp                  = "stopApp"
+	CMD_StopAppAll               = "stopAppAll"
+	CMD_LaunchCompositors        = "launchCompositors"
+	CMD_LaunchCompositorsAsync   = "launchCompositorsAsync"
+	CMD_LaunchCompositorsAsyncCb = "launchCompositorsAsyncCb"
+	CMD_StopCompositors          = "stopCompositors"
+	CMD_GetAppStatus             = "getAppStatus"
+	CMD_GetAppComm               = "getAppCmd"
+	CMD_GetExecutableAppList     = "getExecutableAppList"
+)
+
+type CommTaskContext struct {
+	Ctx     context.Context
+	Cancel  context.CancelFunc
+	AppName string
+}
+
+func NewCommTaskCtx(appName string) *CommTaskContext {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &CommTaskContext{
+		Ctx:     ctx,
+		Cancel:  cancel,
+		AppName: appName,
+	}
+}
 
 type MultiFlag []string
 
@@ -17,22 +74,7 @@ func (m *MultiFlag) Set(value string) error {
 	return nil
 }
 
-func isIpv4(ip string) bool {
-	if net.ParseIP(ip) != nil {
-		for i := 0; i < len(ip); i++ {
-			switch ip[i] {
-			case '.':
-				return true
-			case ':':
-				return false
-			}
-		}
-	}
-
-	return false
-}
-
-func GetEnv(key, fallback string) string {
+func GetEnv(key string, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
@@ -71,23 +113,9 @@ func GetIpAddrsOfAllInterfaces() ([]string, error) {
 	}
 
 	if len(ipaddrs) == 0 {
-		return ipaddrs, errors.New("Cannot Find My IpAddr from ifaces")
+		return ipaddrs, errors.New("Cannnot Find My IpAddr from ifaces")
 	} else {
 		return ipaddrs, nil
 	}
 
-}
-
-func GetFreePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		return 0, err
-	}
-
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return 0, err
-	}
-	defer l.Close()
-	return l.Addr().(*net.TCPAddr).Port, nil
 }

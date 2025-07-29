@@ -14,57 +14,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 #CURDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 GO?=go
 GOBUILDFLAGS?=-v
 
+###linux
+GOOS?=linux
+
+###################
+
+###x86_64 64-bit
+GOARCH?=amd64
+
+###arm64 64-bit
+#GOARCH?=arm64
+
+ifeq ($(GOOS), linux)
+    ifeq ($(GOARCH), amd64)
+        LIBTARGET=gcc
+    else ifeq ($(GOARCH), arm64)
+        LIBTARGET=aarch64-linux-gnu-gcc
+    endif
+endif
+
 THIS_DIR=.
 
-MODULES=
+UCLCLIENTSO?=libuclclient.so
+UCLCLIENTH?=libuclclient.h
+INSTALL_LIBDIR?=$(GOPATH)/pkg/libuclclient
 
-INSTALL_MODULES=$(patsubst %,install-%, $(MODULES))
-CLEAN_MODULES=$(patsubst %,clean-%, $(MODULES))
-FMT_MODULES=$(patsubst %,fmt-%, $(MODULES))
-LINT_MODULES=$(patsubst %,lint-%, $(MODULES))
-DOC_MODULES=$(patsubst %,doc-%, $(MODULES))
 
-.PHONY: all install
-all: install
+.PHONY: uclclientlib
+uclclientlib:
+	set -e ; \
+	GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=1 CC=${LIBTARGET} $(GO) build -buildmode=c-shared -o $(UCLCLIENTSO) $(GOBUILDFLAGS) -ldflags '-extldflags "-Wl,-soname=$(UCLCLIENTSO)"' . ; \
+	install -o $(USER) -g $(USER) -m 755 -d $(INSTALL_LIBDIR) ; \
+	install -o $(USER) -g $(USER) -m 664 $(UCLCLIENTSO) $(INSTALL_LIBDIR)/$(UCLCLIENTSO) ; \
+	install -o $(USER) -g $(USER) -m 664 $(UCLCLIENTH) $(INSTALL_LIBDIR)/$(UCLCLIENTH) ; \
+	rm $(UCLCLIENTSO) $(UCLCLIENTH)
 
-.PHONY: $(INSTALL_MODULES)
-$(INSTALL_MODULES):
+.PHONY: test
+test: $(TEST_MODULES)
 	set -e;\
-	target=`echo $@ | sed -e 's/install-//'`;\
-	make -C $${target} install
-
-.PHONY: $(FMT_MODULES)
-$(FMT_MODULES) :
-	set -e;\
-	target=`echo $@ | sed -e 's/fmt-//'`;\
-	make -C $${target} fmt
-
-.PHONY: $(LINT_MODULES)
-$(LINT_MODULES):
-	set -e;\
-	target=`echo $@ | sed -e 's/lint-//'`;\
-	make -C $${target} lint
-
-.PHONY: $(DOC_MODULES)
-$(DOC_MODULES):
-	set -e;\
-	target=`echo $@ | sed -e 's/doc-//'`;\
-	make -C $${target} doc
-
-.PHONY: $(CLEAN_MODULES)
-$(CLEAN_MODULES):
-	set -e;\
-	target=`echo $@ | sed -e 's/clean-//'`;\
-	make -C $${target} clean 
-
-install: $(INSTALL_MODULES)
-	set -e;\
-	$(GO) install ${GOBUILDFLAGS} .
+	$(GO) test .
 
 .PHONY: fmt
 fmt: $(FMT_MODULES)
@@ -85,5 +79,3 @@ doc: $(DOC_MODULES)
 clean: $(CLEAN_MODULES)
 	set -e;\
 	$(GO) clean -v .
-
-
