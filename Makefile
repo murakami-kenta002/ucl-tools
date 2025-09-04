@@ -94,13 +94,13 @@ CUSTOM_GOARCH?=amd64
 
 ifeq ($(CUSTOM_GOOS), linux)
     ifeq ($(CUSTOM_GOARCH), amd64)
-        LIBTARGET=gcc
+        CUSTOM_CC=gcc
     else ifeq ($(CUSTOM_GOARCH), arm64)
-        LIBTARGET=aarch64-linux-gnu-gcc
+        CUSTOM_CC=aarch64-linux-gnu-gcc
     endif
 endif
 
-.PHONY: custom_all custom_install
-custom_all : custom_install
-custom_install : $(INSTALL_MODULES)
-	make GOOS=${CUSTOM_GOOS} GOARCH=${CUSTOM_GOARCH} CC=${LIBTARGET} uclclientlib
+.PHONY: custom_all
+custom_all :
+	set -e;\
+	make GOOS=${CUSTOM_GOOS} GOARCH=${CUSTOM_GOARCH} CC=${CUSTOM_CC} all
