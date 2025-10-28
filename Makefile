@@ -147,6 +147,7 @@ mod:
 	if [ ! -f go.mod ]; then go mod init ucl-tools; fi ;\
 	go get google.golang.org/grpc@${GRPC_VERSION}; \
 	go mod tidy
+	go mod vendor
 
 .PHONY: proto
 proto:
